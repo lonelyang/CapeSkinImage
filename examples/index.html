@@ -1,17 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="x-ua-compatible" content="ie=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-	<title>skinview3d</title>
+	<title>皮肤披肩生成器</title>
 	<style>
-		@font-face {
-			font-family: 'Minecraft';
-			src: url('font/minecraft.woff2') format('woff2');
-		}
-
 		body {
 			font-family: "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
 			margin: 5px;
@@ -38,7 +33,7 @@
 			display: inline;
 		}
 
-		.control + .control {
+		.control+.control {
 			margin-left: 10px;
 		}
 
@@ -104,115 +99,232 @@
 		.hidden {
 			display: none;
 		}
+
+		.button-container {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			margin-top: 20px;
+		}
+
+		.skin-container {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		.control-button {
+			padding: 10px 20px;
+			border: none;
+			border-radius: 4px;
+			background-color: #4CAF50;
+			color: white;
+			font-size: 16px;
+			cursor: pointer;
+			transition: background-color 0.3s ease;
+			margin-right: 10px;
+		}
+
+		.control-button:hover {
+			background-color: #45a049;
+		}
+
+		.button-container .control-button:last-child {
+			margin-right: 0;
+		}
+
+		.back-equipment-section {
+			margin-top: 20px;
+			padding: 10px;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			background-color: #f5f5f5;
+		}
+
+		.back-equipment-section h2 {
+			margin-top: 0;
+			padding-bottom: 10px;
+			border-bottom: 1px solid #ccc;
+		}
+
+		.back-equipment-section .control label {
+			display: block;
+			margin-bottom: 10px;
+			cursor: pointer;
+		}
+
+		.back-equipment-section .control input[type="radio"] {
+			margin-right: 5px;
+		}
+
+		.back-equipment-section .control input[type="radio"]:checked+label {
+			font-weight: bold;
+		}
+
+		.skin-option {
+			margin-bottom: 15px;
+		}
+
+		.file-select-btn {
+			margin-left: 5px;
+		}
+
+		#skin_url {
+			padding: 5px;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			width: 200px;
+		}
+
+		select {
+			padding: 5px;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			width: 100%;
+		}
+
+		#skin_url_upload {
+			display: none;
+		}
+
+		#skin_url_unset {
+			margin-left: 5px;
+		}
+
+		.control button {
+			padding: 8px 16px;
+			border: none;
+			border-radius: 4px;
+			background-color: #4CAF50;
+			color: white;
+			cursor: pointer;
+			transition: background-color 0.3s ease;
+		}
+
+		.control button:hover {
+			background-color: #45a049;
+		}
+
+		footer {
+			background-color: #f5f5f5;
+			padding: 20px 0;
+			text-align: center;
+			font-size: 14px;
+			color: #666;
+			border-top: 1px solid #ddd;
+		}
+
+		footer a {
+			color: #337ab7;
+			text-decoration: none;
+			transition: color 0.3s ease;
+		}
+
+		footer a:hover {
+			color: #23527c;
+		}
+
+		.footer-content {
+			line-height: 1.6;
+		}
+
+		.skin-container {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
 	</style>
 </head>
 
 <body>
-
-	<canvas id="skin_container"></canvas>
+	<div class="skin-container">
+		<canvas id="skin_container"></canvas>
+	</div>
 
 	<div class="controls">
-
-		<button id="reset_all" type="button" class="control">重置</button>
-		<button id="print_png" type="button" class="control">保存</button>
-
-		<div class="control-section">
-			<h1>旋转</h1>
-			<label class="control"><input id="auto_rotate" type="checkbox">启用</label></br>
-			<label class="control">速度：<input id="auto_rotate_speed" type="number" value="2" step="0.1" size="3"></label>
+		<div class="button-container">
+			<button id="reset_all" type="button" class="control-button">重载</button>
+			<button id="print_png" type="button" class="control-button">保存</button>
+			<button id="skin_url_unset" type="button" class="control-button">取消</button>
+			<button type="button" class="control-button"
+				onclick="document.getElementById('skin_url_upload').click();">导入</button>
 		</div>
 
-		<div class="control-section">
-			<h1>动画</h1>
-			<div>
-				<label><input type="radio" id="animation_none" name="animation" value="" checked>无</label>
-				<label><input type="radio" id="animation_idle" name="animation" value="idle">空闲</label>
-				<label><input type="radio" id="animation_walk" name="animation" value="walk">行走</label>
-				<label><input type="radio" id="animation_run" name="animation" value="run">奔跑</label>
-				<label><input type="radio" id="animation_fly" name="animation" value="fly">滑翔</label>
-			</div>
-			<label class="control">速度：<input id="animation_speed" type="number" value="1" step="0.1" size="3"></label>
-			<button id="animation_pause_resume" type="button" class="control">暂停 / 继续</button>
-		</div>
-			<div>
-				<h2>背部装备</h2>
-				<div class="control">
-					<label><input type="radio" id="back_equipment_cape" name="back_equipment" value="cape" checked>披风</label>
-					<label><input type="radio" id="back_equipment_elytra" name="back_equipment" value="elytra">鞘翅</label>
-				</div>
-			</div>
+		<div>
+			<input id="skin_url" type="text" value="img/stevea.png" placeholder="none" list="default_skins" size="20"
+				style="display: none;">
+			<input id="skin_url_upload" type="file" class="hidden" accept="image/*" style="display: none;">
+			<input id="auto_rotate" type="checkbox" style="display: none;" checked>
+			<input id="auto_rotate_speed" type="number" value="1" step="0.1" size="3" style="display: none;">
+			<input type="radio" id="animation_none" name="animation" value="" checked="" style="display: none;">
+			<input id="animation_speed" type="number" value="1" step="0.1" size="3" style="display: none;">
+			<button id="animation_pause_resume" type="button" class="control" style="display: none;"></button>
 		</div>
 
-		<div class="control-section">
-			<h1>皮肤</h1>
-			<div>
-				<div class="control">
-					<label>皮肤文件：<input id="skin_url" type="text" value="img/steve.png" placeholder="none" list="default_skins" size="20"></label>
-					<input id="skin_url_upload" type="file" class="hidden" accept="image/*">
-					<button id="skin_url_unset" type="button" class="control hidden">取消</button>
-					<button type="button" class="control"
-						onclick="document.getElementById('skin_url_upload').click();">选择文件</button>
-				</div>
-			</div>
-			<div>
-				<label class="control">模型：
-					<select id="skin_model">
-						<option value="default" selected>宽型</option>
-						<option value="slim">纤细</option>
-					</select>
+		<div class="back-equipment-section">
+			<h2>类型</h2><br>
+			<div class="control">
+				<label>
+					<input type="radio" id="back_equipment_cape" name="back_equipment" value="cape" checked>
+					披风
 				</label>
-			</div>
-			<div>
-				<label class="control">披风：
-					<select id="cape">
-						<option value="creeper" selected>15 周年</option>
-						<option value="tiktok">Tiktok</option>
-						<option value="twitch">Twitch</option>
-					</select>
+				<label>
+					<input type="radio" id="back_equipment_elytra" name="back_equipment" value="elytra">
+					鞘翅
 				</label>
 			</div>
 		</div>
-		<div class="control-section">
-			<h1>附加装饰</h1>
-			<div>
-				<label class="control">外套：
-					<select id="coat">
-						<option value="none" selected>无</option>
-						<option value="creeper">15 周年</option>
-						<option value="tiktok">Tiktok</option>
-						<option value="twitch">Twitch</option>
-					</select>
-				</label>
-			</div>
-			<div>
-				<label class="control">披肩：
-					<select id="shawl">
-						<option value="none" selected>无</option>
-						<option value="creeper">15 周年</option>
-						<option value="tiktok">Tiktok</option>
-						<option value="twitch">Twitch</option>
-					</select>
-				</label>
-			</div>
-		</div>
+	</div>
+
+
+	<div class="back-equipment-section">
+		<h2>模型</h2><br>
+		<select id="skin_model">
+			<option value="default" selected="">粗臂</option>
+			<option value="slim">细臂</option>
+		</select>
 
 	</div>
 
+	<div class="back-equipment-section">
+		<h2>披风</h2><br>
+		<select id="cape">
+			<option value="creeper" selected="">15 周年</option>
+			<option value="tiktok">Tiktok</option>
+			<option value="twitch">Twitch</option>
+		</select>
+	</div>
+
+	<div class="back-equipment-section">
+		<h2>外套</h2><br>
+		<select id="coat">
+			<option value="none" selected="">无</option>
+			<option value="creeper">15 周年</option>
+			<option value="tiktok">Tiktok</option>
+			<option value="twitch">Twitch</option>
+		</select>
+	</div>
+
+	<div class="back-equipment-section">
+		<h2>披肩</h2><br>
+		<select id="shawl">
+			<option value="none" selected="">无</option>
+			<option value="creeper">15 周年</option>
+			<option value="tiktok">Tiktok</option>
+			<option value="twitch">Twitch</option>
+		</select>
+	</div>
+
 	<footer>
-		<div>
-			外套&披肩素材：<a href="https://space.bilibili.com/170651403">邹陈云飞</a></br>
+		<div class="footer-content">
+			外套&披肩素材：<a href="https://space.bilibili.com/170651403">邹陈云飞</a><br>
+			分支项目：<a href="https://github.com/weifeng233/skinview3d">微风233</a><br>
+			分支的分支项目：<a href="https://github.com/weifeng233/skinview3d">小羊lonel</a><br>
 			使用开源项目：<a href="https://github.com/bs-community/skinview3d">bs-community/skinview3d</a>
 		</div>
-		<!--%%deploy_only%%
-			<div>
-				Built from
-				commit <a href="https://github.com/bs-community/skinview3d/commit/{{build_commit}}">{{build_commit}}</a>
-				at <time datetime="{{build_time}}">{{build_time}}</time>
-			</div>
-		-->
 	</footer>
 
-	<script src="../bundles/skinview3d.bundle.js"></script>
+	<script src="js/skinview3d.bundle.js"></script>
 	<script>
 		const skinParts = ["head", "body", "rightArm", "leftArm", "rightLeg", "leftLeg"];
 		const skinLayers = ["innerLayer", "outerLayer"];
@@ -252,16 +364,16 @@
 				imageDimensions = img.width;
 				//console.log(imageDimensions);
 				var canvas = document.createElement('canvas');
-				var context = canvas.getContext('2d'); 
+				var context = canvas.getContext('2d');
 				canvas.width = img.width;
 				canvas.height = img.height;
 				context.drawImage(img, 0, 0, img.width, img.height);
-				var imageData = context.getImageData(55*(img.width/64), 20*(img.height/64), 1, 1);
+				var imageData = context.getImageData(55 * (img.width / 64), 20 * (img.height / 64), 1, 1);
 				var data = imageData.data;
 				var alpha = data[3];
-				if(alpha>128){
+				if (alpha > 128) {
 					document.getElementById("skin_model").value = "default";
-				}else{
+				} else {
 					document.getElementById("skin_model").value = "slim";
 				}
 				reloadSkin();
@@ -319,24 +431,25 @@
 
 					let skinImg = skinViewer.skinCanvas;
 					let tempCanvas = document.createElement('canvas');
-					let tempContext = tempCanvas.getContext('2d',{ willReadFrequently: true });
+					let tempContext = tempCanvas.getContext('2d', { willReadFrequently: true });
 					tempContext.drawImage(skinImg, 0, 0);
 					let coat_promise = skinViewer.loadImage(overlayUrlWithTimestamp)
 						.then(image => {
-						const context = skinImg.getContext('2d',{ willReadFrequently: true });
-						context.drawImage(tempCanvas, 0, 0);
-						context.drawImage(image, 0, 0);
-					})
-					.then(() => {
-						skinViewer.loadSkin(skinImg.toDataURL('image/png'), {
-							model: document.getElementById("skin_model").value
+							const context = skinImg.getContext('2d', { willReadFrequently: true });
+							context.drawImage(tempCanvas, 0, 0);
+							context.drawImage(image, 0, 0);
+						})
+						.then(() => {
+							skinViewer.loadSkin(skinImg.toDataURL('image/png'), {
+								model: document.getElementById("skin_model").value
+							});
+						})
+						.catch(error => {
+							console.error('Error loading image:', error);
 						});
-					})
-					.catch(error => {
-						console.error('Error loading image:', error);
-					});
 				}
 			}
+
 		}
 
 		function reloadCape() {
@@ -367,7 +480,7 @@
 					skinViewer.animation.speed = e.target.value;
 				}
 			});
-			
+
 
 			const initializeUploadButton = (id, callback) => {
 				const urlInput = document.getElementById(id);
@@ -393,8 +506,8 @@
 			document.getElementById("skin_model").addEventListener("change", () => reloadSkin());
 
 			document.getElementById("cape").addEventListener("change", () => reloadCape());
-			document.getElementById("coat").addEventListener("change", (e) => {reloadSkin(e)});
-			document.getElementById("shawl").addEventListener("change", (e) => {reloadSkin(e)});
+			document.getElementById("coat").addEventListener("change", (e) => { reloadSkin(e) });
+			document.getElementById("shawl").addEventListener("change", (e) => { reloadSkin(e) });
 
 
 			for (const el of document.querySelectorAll('input[type="radio"][name="back_equipment"]')) {
@@ -458,19 +571,9 @@
 		initializeViewer();
 	</script>
 
-	<script type="module" src="https://unpkg.com/stats.js@0.17.0/src/Stats.js" integrity="sha384-W71K+d2HbqXqQWSj3Vj4RDsIVvIV7lR8O6RArKAiqB39ntwLci0W08qOn4Z1n8sM" crossorigin="anonymous" async></script>
-	<script type="module" async>
-		import Stats from "https://unpkg.com/stats.js@0.17.0/src/Stats.js";
-		const stats = new Stats();
-		stats.dom.style.left = "";
-		stats.dom.style.right = "0";
-		document.body.appendChild(stats.dom);
-		function loop() {
-			stats.update();
-			requestAnimationFrame(loop)
-		}
-		requestAnimationFrame(loop);
-	</script>
-
+	<script type="module" src="https://unpkg.com/stats.js@0.17.0/src/Stats.js"
+		integrity="sha384-W71K+d2HbqXqQWSj3Vj4RDsIVvIV7lR8O6RArKAiqB39ntwLci0W08qOn4Z1n8sM" crossorigin="anonymous"
+		async=""></script>
 </body>
+
 </html>
