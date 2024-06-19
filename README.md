@@ -28,7 +28,7 @@ CapeSkinImage
 
 - By default, this item uses a shawl & coat as an overlay
 
--Preview: 
+- Preview: 
 [CapeSkinImage](https://lonel.cc/capeskin)
 
 ---
